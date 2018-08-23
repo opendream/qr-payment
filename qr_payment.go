@@ -1,4 +1,4 @@
-package main
+package qr_payment
 
 import (
 	"fmt"
@@ -15,12 +15,12 @@ type QrPaymentTag struct {
 
 func NewQrPaymentTag() *QrPaymentTag {
 	q := &QrPaymentTag{}
-	q.addTag("00", "01")
-	q.addTag("01", "12")
+	q.AddTag("00", "01")
+	q.AddTag("01", "12")
 	return q
 }
 
-func (q *QrPaymentTag) addTag(id string, value string) (*QrPaymentTag) {
+func (q *QrPaymentTag) AddTag(id string, value string) (*QrPaymentTag) {
 	tag := &QrPaymentTag{
 		Id: id,
 		Value: value,
@@ -29,7 +29,7 @@ func (q *QrPaymentTag) addTag(id string, value string) (*QrPaymentTag) {
 	return tag
 }
 
-func (q *QrPaymentTag) getTag(id string) (*QrPaymentTag) {
+func (q *QrPaymentTag) GetTag(id string) (*QrPaymentTag) {
 	for _, tag := range q.Tags {
 		if tag.Id == id {
 			return tag
@@ -38,11 +38,11 @@ func (q *QrPaymentTag) getTag(id string) (*QrPaymentTag) {
 	return nil
 }
 
-func (q *QrPaymentTag) getCode() string {
+func (q *QrPaymentTag) GetCode() string {
 	if len(q.Tags) > 0 {
 		var b bytes.Buffer
 		for _, tag := range q.Tags {
-			b.WriteString(tag.getCode())
+			b.WriteString(tag.GetCode())
 		}
 		q.Value = b.String()
 	}
@@ -54,9 +54,9 @@ func (q *QrPaymentTag) getCode() string {
 	}
 }
 
-func (q *QrPaymentTag) getQrCode() string {
-	code := q.getCode()
+func (q *QrPaymentTag) GetQrCode() string {
+	code := fmt.Sprintf(`%s6304`, q.GetCode())
 	checksum := crc16.ChecksumCCITTFalse([]byte(code))
-	qrCode := fmt.Sprintf(`%s6304%04X`, code, checksum)
+	qrCode := fmt.Sprintf(`%s%04X`, code, checksum)
 	return qrCode
 }
